@@ -1,10 +1,8 @@
-![](gluten-free)
-<img src="https://forthebadge.com/images/badges/gluten-free.svg">
-
 # wunbot
 
 wunbot is a Discord bot written in [Python](https://www.python.org "Python homepage"). It launches predesignated files in "bot directory/files"
-
+![](gluten-free)
+<img src="https://forthebadge.com/images/badges/gluten-free.svg">
 ### How do I set it up?
 
 Run like any other python prgram `python3 wunbot.py` 
