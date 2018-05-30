@@ -6,7 +6,7 @@ wunbot is a Discord bot written in [Python](https://www.python.org "Python homep
 <img src="https://forthebadge.com/images/badges/gluten-free.svg">
 ### How do I set it up?
  
-Simply replace apikey with your discord bot's apikey and run like any other python prgram `python3 wunbot.py` 
+Simply replace apikey with your discord bot's apikey and run like any other python program `python3 wunbot.py` 
 
 On windows, I like to make a .bat with the contents 
 ```
@@ -18,8 +18,12 @@ pause
 Discord.py is a dependancy. Make sure to `python3 -m pip install -U discord.py` before running. 
 
 ### Commands
+wunbot_LaunchFile.py:
+`???launch [filename]`
 
-There is one command: `???launch [filename]`
+wunbot_SendFileOnceDaily.py:
+`!dayn` sends message with day/365
+`!potd` sends pictures of the day
 
 ### Configuration
 

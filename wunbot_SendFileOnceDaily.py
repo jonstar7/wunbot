@@ -23,13 +23,14 @@ async def my_background_task():
         print("It's equal")
     else:
         await client.wait_until_ready()
-        # channel = discord.Object(id='347476380763684876')139855291629043713
         channel = discord.Object(id='347476380763684876')
-        # while not client.is_closed:
-        await client.send_file(channel, "pictures\\" + filenames[day_of_year])
-        file = open("sendtracker.txt","w+") 
-        file.write(str(day_of_year))
-        file.close() 
+        try:
+            await client.send_file(channel, "pictures\\" + filenames[day_of_year])
+            file = open("sendtracker.txt","w+") 
+            file.write(str(day_of_year))
+            file.close() 
+        except:
+            print("File for day " + str(day_of_year) + " not found")
 
 @client.event
 async def on_ready():
@@ -57,7 +58,10 @@ async def on_message(message):
     elif message.content.startswith('!dayn'):
         await client.send_message(message.channel, day_of_year)
     elif message.content.startswith('!potd'):
-        #await client.send_message(message.channel, filenames[day_of_year])
-        await client.send_file(message.channel, "pictures\\" + filenames[day_of_year])
+        try:
+            await client.send_file(message.channel, "pictures\\" + filenames[day_of_year])
+        except:
+            await client.send_message(message.channel, "File for day "+ str(day_of_year) + " not found")
+
 
 client.run(apikey)
