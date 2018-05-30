@@ -1,14 +1,14 @@
 # wunbot
 
-wunbot is a Discord bot written in [Python](https://www.python.org "Python homepage"). It launches predesignated files in "bot directory/files"
+wunbot is an unfinished Discord bot written in [Python](https://www.python.org "Python homepage"). Its first generation launches predesignated files in "bot directory/files"
 
 ![](gluten-free)
 <img src="https://forthebadge.com/images/badges/gluten-free.svg">
 ### How do I set it up?
  
-Simply replace apikey with your discord bot's apikey and run like any other python program `python3 wunbot.py` 
+Simply replace apikey with your Discord bot's apikey and run like any other Python program `python3 wunbot.py` 
 
-On windows, I like to make a .bat with the contents 
+On Windows, I like to make a .bat with the contents 
 ```
 SET apikey=YOUR_ACTUAL_API_KEY
 python FILENAME_TO_RUN.py
