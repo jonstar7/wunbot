@@ -5,8 +5,15 @@ wunbot is a Discord bot written in [Python](https://www.python.org "Python homep
 ![](gluten-free)
 <img src="https://forthebadge.com/images/badges/gluten-free.svg">
 ### How do I set it up?
+ 
+Simply replace apikey with your discord bot's apikey and run like any other python prgram `python3 wunbot.py` 
 
-Run like any other python prgram `python3 wunbot.py` 
+On windows, I like to make a .bat with the contents 
+```
+SET apikey=YOUR_ACTUAL_API_KEY
+python FILENAME_TO_RUN.py
+pause
+```
 
 Discord.py is a dependancy. Make sure to `python3 -m pip install -U discord.py` before running. 
 
