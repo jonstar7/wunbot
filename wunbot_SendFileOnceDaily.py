@@ -10,6 +10,8 @@ import os
 client = discord.Client()
 
 apikey = os.getenv("apikey")
+channelID = os.getenv("channelID")
+
 today = datetime.datetime.now()
 day_of_year = (today - datetime.datetime(today.year, 1, 1)).days + 1
 filenames = glob.glob1('pictures', '*.*')
@@ -27,7 +29,7 @@ async def my_background_task():
     if canSend:
         canSend = False
         await client.wait_until_ready()
-        channel = discord.Object(id='347476380763684876')
+        channel = discord.Object(id=channelID)
         try:
             file = open("sendtracker.txt","w+") 
             file.write(str(day_of_year))
@@ -49,18 +51,8 @@ async def on_ready():
 @client.event
 async def on_message(message):
     await my_background_task()
-    if message.content.startswith('!test'):
-        counter = 0
-        tmp = await client.send_message(message.channel, 'Calculating messages...')
-        async for log in client.logs_from(message.channel, limit=100):
-            if log.author == message.author:
-                counter += 1
 
-        await client.edit_message(tmp, 'You have {} messages.'.format(counter))
-    elif message.content.startswith('!sleep'):
-        await asyncio.sleep(5)
-        await client.send_message(message.channel, 'Done sleeping')
-    elif message.content.startswith('!dayn'):
+    if message.content.startswith('!dayn'):
         await client.send_message(message.channel, day_of_year)
     elif message.content.startswith('!potd'):
         try:
