@@ -14,21 +14,26 @@ today = datetime.datetime.now()
 day_of_year = (today - datetime.datetime(today.year, 1, 1)).days + 1
 filenames = glob.glob1('pictures', '*.*')
 filenames = sorted(filenames, key=lambda x: float(x.split()[0]))
+canSend = True
 
 async def my_background_task():
     file = open("sendtracker.txt", "r") 
     contents = file.read()
-    file.close()
     if int(contents) == day_of_year:
-        print("It's equal")
+        canSend = False
     else:
+        canSend = True
+    file.close()
+    if canSend:
+        canSend = False
         await client.wait_until_ready()
         channel = discord.Object(id='347476380763684876')
         try:
-            await client.send_file(channel, "pictures\\" + filenames[day_of_year])
             file = open("sendtracker.txt","w+") 
             file.write(str(day_of_year))
-            file.close() 
+            file.close()
+            await client.send_file(channel, "pictures\\" + filenames[day_of_year])
+            await asyncio.sleep(5)
         except:
             print("File for day " + str(day_of_year) + " not found")
 
