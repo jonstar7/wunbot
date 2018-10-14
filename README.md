@@ -1,6 +1,6 @@
 # wunbot
 
-wunbot is an unfinished Discord bot written in [Python](https://www.python.org "Python homepage"). Its first generation launches predesignated files in "bot directory/files"
+wunbot is an unfinished Discord bot written in [Python](https://www.python.org "Python homepage").
 
 ![](gluten-free)
 <img src="https://forthebadge.com/images/badges/gluten-free.svg">
@@ -20,6 +20,7 @@ Discord.py is a dependancy. Make sure to `python3 -m pip install -U discord.py` 
 ### Commands
 wunbot_LaunchFile.py:
 `???launch [filename]`
+place files before in "bot directory/files"
 
 wunbot_SendFileOnceDaily.py:
 `!dayn` sends message with day/365
