@@ -20,7 +20,7 @@ Discord.py is a dependancy. Make sure to `python3 -m pip install -U discord.py` 
 ### Commands
 wunbot_LaunchFile.py:
 `???launch [filename]`
-place files before in "bot directory/files"
+place files in "bot directory/files"
 
 wunbot_SendFileOnceDaily.py:
 `!dayn` sends message with day/365
