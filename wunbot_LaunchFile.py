@@ -8,6 +8,8 @@ import psutil
 #TODO No such file found
 #TODO add utilty to add files
 
+apikey = os.getenv("apikey")
+
 #sets working directory
 script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
 rel_path = "files"
