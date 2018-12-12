@@ -2,13 +2,14 @@
 # Discord bot that sends 1 file in pictures/*.* based on the day, once daily. 
 
 import discord
-# from discord.ext import commands
+from discord.ext import commands
 import asyncio
 import datetime
 import glob, csv
 import os, sys, subprocess
 import psutil 
 
+bot = commands.Bot(command_prefix='$')
 client = discord.Client()
 
 apikey = os.getenv("apikey")
@@ -65,6 +66,12 @@ async def on_ready():
     print('------')
     await my_background_task()
 
+# @client.event
+# async def discord.on_command(left : int, right : int):
+#     """Adds two numbers together."""
+#     await bot.say(left + right)
+
+
 @client.event
 async def on_message(message):
     await my_background_task()
@@ -76,30 +83,68 @@ async def on_message(message):
             await client.send_file(message.channel, "pictures\\" + filenames[day_of_year])
         except:
             await client.send_message(message.channel, "File for day "+ str(day_of_year) + " not found")
-    elif message.content.startswith('!launch Sev'): # terrible code
-        await client.send_message(message.channel, "opening " + "Sev")
-        with open('files.csv') as csvDataFile:
-            csvReader = csv.reader(csvDataFile)
-            for row in csvReader:
-                if row[0] == "Sev":
-                    print("launching " + row[1])
-                    #open_file(row[1])
+    elif message.content.startswith('!strike'):
+        temp_strike_msg = "Strike given to " + message.content[8:]
+        await client.send_message(message.channel, temp_strike_msg) #, tts=True
+        # await client.send_message(message.channel, message.mentions[0])
+
+
+        temp_list = []
+        with open('strikes.csv', newline='') as csvfile:
+            spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+            for row in spamreader:
+                print(' '.join(row))
+            temp_list.extend(spamreader)
+        with open('strikes.csv', 'w+', newline='') as csvfile:
+            spamwriter = csv.writer(csvfile, delimiter=' ',
+                            quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            for line, row in enumerate(temp_list):
+                data = message.mentions[0].get(line, row)
+                spamwriter.writerow(data)
+
+
+
+
+        # with open('strikes.csv', 'rb') as infile, open('strikes.csv.new', 'wb') as outfile:
+        # # with open('strikes.csv','w+',newline='\n') as csvDataFile:
+        # #     csvReader = csv.reader(csvDataFile)
+        # #     csvWriter = csv.writer(csvDataFile)
+        #     writer = csv.writer(outfile)
+        #     print("writer init")
+        #     for row in csv.writer(infile):
+        #         if row[0] == message.mentions[0]:
+        #             print("if")
+        #             # print(message.mentions[0] + " has " + row[1] + " strikes.")
+        #             # writer.writerow([message.mentions[0]], 1)
+        #         else:
+        #             print("else")
+        #             ## newstrike = row[1]+1
+        #             # writer.writerow([message.mentions[0]], 1)
+        # os.rename('strikes.csv.new','strikes.csv')
+    # elif message.content.startswith('!launch Sev'): # terrible code
+    #     await client.send_message(message.channel, "opening " + "Sev")
+    #     with open('files.csv') as csvDataFile:
+    #         csvReader = csv.reader(csvDataFile)
+    #         for row in csvReader:
+    #             if row[0] == "Sev":
+    #                 print("launching " + row[1])
+    #                 #open_file(row[1])
                     
-                    #joins the working directory and the filename
-                    abs_file_path_row = os.path.join(abs_file_path,row[1])
-                    open_file(abs_file_path_row)
-    elif message.content.startswith('!launch sev'):# terrible code, I'm sorry albert einstein 
-        await client.send_message(message.channel, "opening " + "Sev")
-        with open('files.csv') as csvDataFile:
-            csvReader = csv.reader(csvDataFile)
-            for row in csvReader:
-                if row[0] == "Sev":
-                    print("launching " + row[1])
-                    #open_file(row[1])
+    #                 #joins the working directory and the filename
+    #                 abs_file_path_row = os.path.join(abs_file_path,row[1])
+    #                 open_file(abs_file_path_row)
+    # elif message.content.startswith('!launch sev'):# terrible code, I'm sorry albert einstein 
+    #     await client.send_message(message.channel, "opening " + "Sev")
+    #     with open('files.csv') as csvDataFile:
+    #         csvReader = csv.reader(csvDataFile)
+    #         for row in csvReader:
+    #             if row[0] == "Sev":
+    #                 print("launching " + row[1])
+    #                 #open_file(row[1])
                     
-                    #joins the working directory and the filename
-                    abs_file_path_row = os.path.join(abs_file_path,row[1])
-                    open_file(abs_file_path_row)
+    #                 #joins the working directory and the filename
+    #                 abs_file_path_row = os.path.join(abs_file_path,row[1])
+    #                 open_file(abs_file_path_row)
 
 
 
