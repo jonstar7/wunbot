@@ -103,7 +103,11 @@ async def on_message(message):
                 spamwriter.writerow(data)
 
 
-
+        # TODO add launching functionality back
+        # TODO add restart and stop functionality
+        # TODO add user friendly way to add and remove programs
+        # TODO add command to display currently running programs 
+        # TODO add python image generation and send images with information about currently running programs
 
         # with open('strikes.csv', 'rb') as infile, open('strikes.csv.new', 'wb') as outfile:
         # # with open('strikes.csv','w+',newline='\n') as csvDataFile:
