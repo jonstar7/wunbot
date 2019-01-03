@@ -8,6 +8,7 @@ import datetime
 import glob, csv
 import os, sys, subprocess
 import psutil 
+import sqlite3
 
 bot = commands.Bot(command_prefix='$')
 client = discord.Client()
@@ -25,6 +26,11 @@ canSend = True
 script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
 rel_path = "files"
 abs_file_path = os.path.join(script_dir, rel_path)
+
+
+# sql variables
+strikeDB = "testdatabase.db"
+strikeTable = "strike"
 
 filename = " "
 def open_file(filename):
@@ -87,20 +93,29 @@ async def on_message(message):
         temp_strike_msg = "Strike given to " + message.content[8:]
         await client.send_message(message.channel, temp_strike_msg) #, tts=True
         # await client.send_message(message.channel, message.mentions[0])
+        conn = sqlite3.connect(strikeDB)
+        c = conn.cursor()
+        #  Creating a new SQLite table with 1 column
+        c.execute('CREATE TABLE {tn} ({nf} {ft})'\
+                .format(tn=strikeTable, nf="user", ft="TEXT"))
 
 
-        temp_list = []
-        with open('strikes.csv', newline='') as csvfile:
-            spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
-            for row in spamreader:
-                print(' '.join(row))
-            temp_list.extend(spamreader)
-        with open('strikes.csv', 'w+', newline='') as csvfile:
-            spamwriter = csv.writer(csvfile, delimiter=' ',
-                            quotechar='|', quoting=csv.QUOTE_MINIMAL)
-            for line, row in enumerate(temp_list):
-                data = message.mentions[0].get(line, row)
-                spamwriter.writerow(data)
+        conn.commit()
+        conn.close()
+
+
+        # temp_list = []
+        # with open('strikes.csv', newline='') as csvfile:
+        #     spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+        #     for row in spamreader:
+        #         print(' '.join(row))
+        #     temp_list.extend(spamreader)
+        # with open('strikes.csv', 'w+', newline='') as csvfile:
+        #     spamwriter = csv.writer(csvfile, delimiter=' ',
+        #                     quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        #     for line, row in enumerate(temp_list):
+        #         data = message.mentions[0].get(line, row)
+        #         spamwriter.writerow(data)
 
 
         # TODO add launching functionality back
