@@ -96,7 +96,7 @@ async def on_message(message):
         conn = sqlite3.connect(strikeDB)
         c = conn.cursor()
         #  Creating a new SQLite table with 1 column
-        c.execute('CREATE TABLE {tn} ({nf} {ft})'\
+        c.execute('CREATE TABLE {tn} ({nf} {ft},strikes integer)'\
                 .format(tn=strikeTable, nf="user", ft="TEXT"))
 
 
