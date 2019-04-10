@@ -11,7 +11,7 @@ import psutil
 import sqlite3
 
 bot = commands.Bot(command_prefix='$')
-client = discord.Client()
+# client = discord.Client()
 
 apikey = os.getenv("apikey")
 channelID = os.getenv("channelID")
@@ -43,6 +43,8 @@ def open_file(filename):
 # description = '''a bot for launching'''
 # bot = commands.Bot(command_prefix='???', description=description)
 
+
+
 async def my_background_task():
     file = open("sendtracker.txt", "r") 
     contents = file.read()
@@ -53,55 +55,89 @@ async def my_background_task():
     file.close()
     if canSend:
         canSend = False
-        await client.wait_until_ready()
+        await bot.wait_until_ready()
         channel = discord.Object(id=channelID)
         try:
             file = open("sendtracker.txt","w+") 
             file.write(str(day_of_year))
             file.close()
-            await client.send_file(channel, "pictures\\" + filenames[day_of_year])
+            await bot.send_file(channel, "pictures\\" + filenames[day_of_year])
             await asyncio.sleep(5)
         except:
             print("File for day " + str(day_of_year) + " not found")
 
-@client.event
+@bot.event
 async def on_ready():
     print('Logged in as')
-    print(client.user.name)
-    print(client.user.id)
+    print(bot.user.name)
+    print(bot.user.id)
     print('------')
     await my_background_task()
 
-# @client.event
+@bot.command()
+async def length(ctx):
+    await ctx.send('Your message is {} characters long.'.format(len(ctx.message.content)))
+# @bot.event
 # async def discord.on_command(left : int, right : int):
 #     """Adds two numbers together."""
 #     await bot.say(left + right)
 
 
-@client.event
+# @bot.command(pass_context=True)
+# async def and(ctex):
+#     if "dance" in ctx.message.content:
+#         await ctx.send('Your message is {} characters long.'.format(ctx.message.content))
+    
+    
+    
+
+# @bot.group()
+# async def get(ctx):
+#     if ctx.invoked_subcommand is None:
+#         await ctx.send('Invalid dance command passed...')
+
+# @git.command()
+# async def push(ctx, remote: str, branch: str):
+#     await ctx.send('Pushing to {} {}'.format(remote, branch))
+
+
+@bot.event
 async def on_message(message):
-    await my_background_task()
+    if message.content.startswith('and DANCE'):
+        await message.channel.send(':D-<')
+        await message.channel.send(':D|-<')
+        await message.channel.send(':D/-<')
 
-    if message.content.startswith('!dayn'):
-        await client.send_message(message.channel, day_of_year)
-    elif message.content.startswith('!potd'):
-        try:
-            await client.send_file(message.channel, "pictures\\" + filenames[day_of_year])
-        except:
-            await client.send_message(message.channel, "File for day "+ str(day_of_year) + " not found")
-    elif message.content.startswith('!strike'):
-        temp_strike_msg = "Strike given to " + message.content[8:]
-        await client.send_message(message.channel, temp_strike_msg) #, tts=True
-        # await client.send_message(message.channel, message.mentions[0])
-        conn = sqlite3.connect(strikeDB)
-        c = conn.cursor()
-        #  Creating a new SQLite table with 1 column
-        c.execute('CREATE TABLE {tn} ({nf} {ft},strikes integer)'\
-                .format(tn=strikeTable, nf="user", ft="TEXT"))
+    # if message.content('and DANCE'):
+    #     await bot.send_message(message.channel, "day_of_year")
+
+    await bot.process_commands(message)
 
 
-        conn.commit()
-        conn.close()
+# @bot.event
+# async def on_message(message):
+#     await my_background_task()
+
+#     if message.content.startswith('!dayn'):
+#         await bot.send_message(message.channel, day_of_year)
+#     elif message.content.startswith('!potd'):
+#         try:
+#             await bot.send_file(message.channel, "pictures\\" + filenames[day_of_year])
+#         except:
+#             await bot.send_message(message.channel, "File for day "+ str(day_of_year) + " not found")
+#     elif message.content.startswith('!strike'):
+#         temp_strike_msg = "Strike given to " + message.content[8:]
+#         await bot.send_message(message.channel, temp_strike_msg) #, tts=True
+#         # await bot.send_message(message.channel, message.mentions[0])
+#         conn = sqlite3.connect(strikeDB)
+#         c = conn.cursor()
+#         #  Creating a new SQLite table with 1 column
+#         c.execute('CREATE TABLE {tn} ({nf} {ft},strikes integer)'\
+#                 .format(tn=strikeTable, nf="user", ft="TEXT"))
+
+
+#         conn.commit()
+#         conn.close()
 
 
         # temp_list = []
@@ -141,7 +177,7 @@ async def on_message(message):
         #             # writer.writerow([message.mentions[0]], 1)
         # os.rename('strikes.csv.new','strikes.csv')
     # elif message.content.startswith('!launch Sev'): # terrible code
-    #     await client.send_message(message.channel, "opening " + "Sev")
+    #     await bot.send_message(message.channel, "opening " + "Sev")
     #     with open('files.csv') as csvDataFile:
     #         csvReader = csv.reader(csvDataFile)
     #         for row in csvReader:
@@ -153,7 +189,7 @@ async def on_message(message):
     #                 abs_file_path_row = os.path.join(abs_file_path,row[1])
     #                 open_file(abs_file_path_row)
     # elif message.content.startswith('!launch sev'):# terrible code, I'm sorry albert einstein 
-    #     await client.send_message(message.channel, "opening " + "Sev")
+    #     await bot.send_message(message.channel, "opening " + "Sev")
     #     with open('files.csv') as csvDataFile:
     #         csvReader = csv.reader(csvDataFile)
     #         for row in csvReader:
@@ -167,4 +203,5 @@ async def on_message(message):
 
 
 
-client.run(apikey)
+bot.run(apikey)
+# bot.start()

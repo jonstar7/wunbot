@@ -3,3 +3,8 @@
 *.gif
 *.jpg
 *.env
+
+/venv
+/env
+
+/.vscode
