@@ -292,10 +292,13 @@ async def on_ready():
     print("smemlistname is ", smemlistname)
     print("smemlistid is ", smemlistid)
     diffmemlistname = [x for x in memlistname if x not in smemlistname]
+    diffmemlistid = [x for x in memlistid if x not in smemlistid]
     print("diffmemlistname is ", diffmemlistname)
-    # c.execute("INSERT INTO alias VALUES ({},'{}')".format(tid,name))
+    for i in range(len(diffmemlistname)):
+        c.execute("INSERT INTO alias VALUES ({},'{}')".format(diffmemlistid[i],diffmemlistname[i]))
     conn.commit()
     c.execute("SELECT * FROM alias")
+    print("okay")
     print(c.fetchall())
     # iterates over members in server
     # adds default nickname
