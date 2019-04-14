@@ -3,7 +3,8 @@
 *.gif
 *.jpg
 *.env
-
+*.webm
+sendtracker.txt
 /venv
 /env
 
