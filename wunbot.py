@@ -6,15 +6,46 @@ from discord.ext import commands
 import asyncio
 import datetime
 import glob, csv
-import os, sys, subprocess
+import os, sys, subprocess, random
 import psutil 
 import sqlite3
+import youtube_dl
 
 bot = commands.Bot(command_prefix='$')
-# client = discord.Client()
 
 apikey = os.getenv("apikey")
 channelID = os.getenv("channelID")
+
+# Suppress noise about console usage from errors
+youtube_dl.utils.bug_reports_message = lambda: ''
+bot = commands.Bot(command_prefix=commands.when_mentioned_or("!"),
+                   description='Slap your friends')
+
+# description = '''a bot for launching'''
+# bot = commands.Bot(command_prefix='???', description=description)
+
+
+ytdl_format_options = {
+    'format': 'bestaudio/best',
+    'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
+    'restrictfilenames': True,
+    'noplaylist': True,
+    'nocheckcertificate': True,
+    'ignoreerrors': False,
+    'logtostderr': False,
+    'quiet': True,
+    'no_warnings': True,
+    'default_search': 'auto',
+    'source_address': '0.0.0.0' # bind to ipv4 since ipv6 addresses cause issues sometimes
+}
+
+ffmpeg_options = {
+    'options': '-vn'
+}
+
+ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
+
+
 
 today = datetime.datetime.now()
 day_of_year = (today - datetime.datetime(today.year, 1, 1)).days + 1
@@ -40,10 +71,6 @@ def open_file(filename):
         opener ="open" if sys.platform == "darwin" else "xdg-open"
         subprocess.call([opener, filename])
 
-# description = '''a bot for launching'''
-# bot = commands.Bot(command_prefix='???', description=description)
-
-
 
 async def my_background_task():
     file = open("sendtracker.txt", "r") 
@@ -56,49 +83,19 @@ async def my_background_task():
     if canSend:
         canSend = False
         await bot.wait_until_ready()
-        channel = discord.Object(id=channelID)
+        channel = bot.get_channel(channelID)
         try:
             file = open("sendtracker.txt","w+") 
             file.write(str(day_of_year))
             file.close()
-            await bot.send_file(channel, "pictures\\" + filenames[day_of_year])
+            await channel.send("pictures\\" + filenames[day_of_year])
             await asyncio.sleep(5)
         except:
             print("File for day " + str(day_of_year) + " not found")
 
-@bot.event
-async def on_ready():
-    print('Logged in as')
-    print(bot.user.name)
-    print(bot.user.id)
-    print('------')
-    await my_background_task()
-
 @bot.command()
 async def length(ctx):
     await ctx.send('Your message is {} characters long.'.format(len(ctx.message.content)))
-# @bot.event
-# async def discord.on_command(left : int, right : int):
-#     """Adds two numbers together."""
-#     await bot.say(left + right)
-
-
-# @bot.command(pass_context=True)
-# async def and(ctex):
-#     if "dance" in ctx.message.content:
-#         await ctx.send('Your message is {} characters long.'.format(ctx.message.content))
-    
-    
-    
-
-# @bot.group()
-# async def get(ctx):
-#     if ctx.invoked_subcommand is None:
-#         await ctx.send('Invalid dance command passed...')
-
-# @git.command()
-# async def push(ctx, remote: str, branch: str):
-#     await ctx.send('Pushing to {} {}'.format(remote, branch))
 
 
 @bot.event
@@ -107,101 +104,144 @@ async def on_message(message):
         await message.channel.send(':D-<')
         await message.channel.send(':D|-<')
         await message.channel.send(':D/-<')
-
-    # if message.content('and DANCE'):
-    #     await bot.send_message(message.channel, "day_of_year")
-
+    
+    # allows @bot.command() to continue functioning
     await bot.process_commands(message)
 
+class YTDLSource(discord.PCMVolumeTransformer):
+    def __init__(self, source, *, data, volume=0.5):
+        super().__init__(source, volume)
 
-# @bot.event
-# async def on_message(message):
-#     await my_background_task()
+        self.data = data
 
-#     if message.content.startswith('!dayn'):
-#         await bot.send_message(message.channel, day_of_year)
-#     elif message.content.startswith('!potd'):
-#         try:
-#             await bot.send_file(message.channel, "pictures\\" + filenames[day_of_year])
-#         except:
-#             await bot.send_message(message.channel, "File for day "+ str(day_of_year) + " not found")
-#     elif message.content.startswith('!strike'):
-#         temp_strike_msg = "Strike given to " + message.content[8:]
-#         await bot.send_message(message.channel, temp_strike_msg) #, tts=True
-#         # await bot.send_message(message.channel, message.mentions[0])
-#         conn = sqlite3.connect(strikeDB)
-#         c = conn.cursor()
-#         #  Creating a new SQLite table with 1 column
-#         c.execute('CREATE TABLE {tn} ({nf} {ft},strikes integer)'\
-#                 .format(tn=strikeTable, nf="user", ft="TEXT"))
+        self.title = data.get('title')
+        self.url = data.get('url')
 
+    @classmethod
+    async def from_url(cls, url, *, loop=None, stream=False):
+        loop = loop or asyncio.get_event_loop()
+        data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
 
-#         conn.commit()
-#         conn.close()
+        if 'entries' in data:
+            # take first item from a playlist
+            data = data['entries'][0]
+
+        filename = data['url'] if stream else ytdl.prepare_filename(data)
+        return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
 
 
-        # temp_list = []
-        # with open('strikes.csv', newline='') as csvfile:
-        #     spamreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
-        #     for row in spamreader:
-        #         print(' '.join(row))
-        #     temp_list.extend(spamreader)
-        # with open('strikes.csv', 'w+', newline='') as csvfile:
-        #     spamwriter = csv.writer(csvfile, delimiter=' ',
-        #                     quotechar='|', quoting=csv.QUOTE_MINIMAL)
-        #     for line, row in enumerate(temp_list):
-        #         data = message.mentions[0].get(line, row)
-        #         spamwriter.writerow(data)
+class Music(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
 
+    @commands.command()
+    async def join(self, ctx, *, channel: discord.VoiceChannel):
+        """Joins a voice channel"""
 
-        # TODO add launching functionality back
-        # TODO add restart and stop functionality
-        # TODO add user friendly way to add and remove programs
-        # TODO add command to display currently running programs 
-        # TODO add python image generation and send images with information about currently running programs
+        if ctx.voice_client is not None:
+            return await ctx.voice_client.move_to(channel)
 
-        # with open('strikes.csv', 'rb') as infile, open('strikes.csv.new', 'wb') as outfile:
-        # # with open('strikes.csv','w+',newline='\n') as csvDataFile:
-        # #     csvReader = csv.reader(csvDataFile)
-        # #     csvWriter = csv.writer(csvDataFile)
-        #     writer = csv.writer(outfile)
-        #     print("writer init")
-        #     for row in csv.writer(infile):
-        #         if row[0] == message.mentions[0]:
-        #             print("if")
-        #             # print(message.mentions[0] + " has " + row[1] + " strikes.")
-        #             # writer.writerow([message.mentions[0]], 1)
-        #         else:
-        #             print("else")
-        #             ## newstrike = row[1]+1
-        #             # writer.writerow([message.mentions[0]], 1)
-        # os.rename('strikes.csv.new','strikes.csv')
-    # elif message.content.startswith('!launch Sev'): # terrible code
-    #     await bot.send_message(message.channel, "opening " + "Sev")
-    #     with open('files.csv') as csvDataFile:
-    #         csvReader = csv.reader(csvDataFile)
-    #         for row in csvReader:
-    #             if row[0] == "Sev":
-    #                 print("launching " + row[1])
-    #                 #open_file(row[1])
-                    
-    #                 #joins the working directory and the filename
-    #                 abs_file_path_row = os.path.join(abs_file_path,row[1])
-    #                 open_file(abs_file_path_row)
-    # elif message.content.startswith('!launch sev'):# terrible code, I'm sorry albert einstein 
-    #     await bot.send_message(message.channel, "opening " + "Sev")
-    #     with open('files.csv') as csvDataFile:
-    #         csvReader = csv.reader(csvDataFile)
-    #         for row in csvReader:
-    #             if row[0] == "Sev":
-    #                 print("launching " + row[1])
-    #                 #open_file(row[1])
-                    
-    #                 #joins the working directory and the filename
-    #                 abs_file_path_row = os.path.join(abs_file_path,row[1])
-    #                 open_file(abs_file_path_row)
+        await channel.connect()
 
+    @commands.command()
+    async def s(self, ctx):
+        """Slaps user specified in message"""
+        victim = ctx.message.mentions[0]
+        kick_channel_name = "Slab"
+        
+        kick_sound_effects = ["wopwop.wav","denied.wav","e.wav"]
+        kick_sound = random.choice(kick_sound_effects)
+        kick_channel_name = kick_sound[0:-4]
 
+        if victim.voice is None:
+            await ctx.send("Member not found")
+            return
+        
+        await ctx.send('Slapping {}'.format(victim.name))
+        kick_channel = await ctx.guild.create_voice_channel(kick_channel_name)
 
+        if ctx.voice_client is not None:
+            await ctx.voice_client.move_to(kick_channel)
+        await kick_channel.connect()
+        await victim.move_to(kick_channel)
+
+        await ctx.voice_client.move_to(kick_channel)
+        source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(kick_sound))
+        ctx.voice_client.play(source, after=lambda e: print('Player error: %s' % e) if e else None)
+        await asyncio.sleep(3)
+        for chan in ctx.guild.voice_channels:
+            if chan.name == kick_channel_name:
+                await chan.delete()
+        await ctx.voice_client.disconnect()
+        # if user is connected to voice else send error msg
+        # create channel SLAPZONE TODO ramdonly generate channel name
+        # move user to channel
+        # join channel 
+        # play countdown sound
+        # after x seconds, delete channel
+
+    @commands.command()
+    async def play(self, ctx, *, query):
+        """Plays a file from the local filesystem"""
+
+        source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(query))
+        ctx.voice_client.play(source, after=lambda e: print('Player error: %s' % e) if e else None)
+
+        await ctx.send('Now playing: {}'.format(query))
+
+    @commands.command()
+    async def yt(self, ctx, *, url):
+        """Plays from a url (almost anything youtube_dl supports)"""
+
+        async with ctx.typing():
+            player = await YTDLSource.from_url(url, loop=self.bot.loop)
+            ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
+
+        await ctx.send('Now playing: {}'.format(player.title))
+
+    @commands.command()
+    async def stream(self, ctx, *, url):
+        """Streams from a url (same as yt, but doesn't predownload)"""
+
+        async with ctx.typing():
+            player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
+            ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
+
+        await ctx.send('Now playing: {}'.format(player.title))
+
+    @commands.command()
+    async def volume(self, ctx, volume: int):
+        """Changes the player's volume"""
+
+        if ctx.voice_client is None:
+            return await ctx.send("Not connected to a voice channel.")
+
+        ctx.voice_client.source.volume = volume / 100
+        await ctx.send("Changed volume to {}%".format(volume))
+
+    @commands.command()
+    async def stop(self, ctx):
+        """Stops and disconnects the bot from voice"""
+
+        await ctx.voice_client.disconnect()
+
+    @play.before_invoke
+    @yt.before_invoke
+    @stream.before_invoke
+    async def ensure_voice(self, ctx):
+        if ctx.voice_client is None:
+            if ctx.author.voice:
+                await ctx.author.voice.channel.connect()
+            else:
+                await ctx.send("You are not connected to a voice channel.")
+                raise commands.CommandError("Author not connected to a voice channel.")
+        elif ctx.voice_client.is_playing():
+            ctx.voice_client.stop()
+
+@bot.event
+async def on_ready():
+    print('Logged in as {0} ({0.id})'.format(bot.user))
+    print('------')
+
+bot.add_cog(Music(bot))
 bot.run(apikey)
-# bot.start()
