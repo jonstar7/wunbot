@@ -149,9 +149,10 @@ class Music(commands.Cog):
         victim = ctx.message.mentions[0]
         kick_channel_name = "Slab"
         
-        kick_sound_effects = ["wopwop.wav","denied.wav","e.wav"]
+        kick_sound_effects = ["wopwop.wav","denied.wav","e.wav","VHS.mp3"]
         kick_sound = random.choice(kick_sound_effects)
         kick_channel_name = kick_sound[0:-4]
+        kick_sound = "assets\\" + kick_sound
 
         if victim.voice is None:
             await ctx.send("Member not found")
