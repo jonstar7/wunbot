@@ -1,6 +1,7 @@
 
 import os, sys, subprocess
 import psutil 
+import random
 
 apikey = os.getenv("apikey")
 channelID = os.getenv("channelID")
@@ -78,6 +79,10 @@ class Music(commands.Cog):
         """Slaps user specified in message"""
         victim = ctx.message.mentions[0]
         kick_channel_name = "Slab"
+        
+        kick_sound_effects = ["wopwop.wav","denied.wav","e.wav"]
+        kick_sound = random.choice(kick_sound_effects)
+        kick_channel_name = kick_sound[0:-4]
 
         if victim.voice is None:
             await ctx.send("Member not found")
@@ -85,14 +90,14 @@ class Music(commands.Cog):
         
         await ctx.send('Slapping {}'.format(victim.name))
         kick_channel = await ctx.guild.create_voice_channel(kick_channel_name)
-        
+
         if ctx.voice_client is not None:
             await ctx.voice_client.move_to(kick_channel)
         await kick_channel.connect()
         await victim.move_to(kick_channel)
 
         await ctx.voice_client.move_to(kick_channel)
-        source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio("wopwop.wav"))
+        source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(kick_sound))
         ctx.voice_client.play(source, after=lambda e: print('Player error: %s' % e) if e else None)
         await asyncio.sleep(3)
         for chan in ctx.guild.voice_channels:
