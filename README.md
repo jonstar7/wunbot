@@ -15,7 +15,7 @@ python FILENAME_TO_RUN.py
 pause
 ```
 
-Discord.py is a dependancy. Make sure to `python3 -m pip install -U discord.py` before running. 
+[Discord.py](https://github.com/Rapptz/discord.py) is a dependancy. Make sure to `python3 -m pip install -U discord.py` before running. 
 
 ### Commands
 wunbot_LaunchFile.py:
