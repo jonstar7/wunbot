@@ -13,6 +13,8 @@ from discord.ext import commands
 
 # Suppress noise about console usage from errors
 youtube_dl.utils.bug_reports_message = lambda: ''
+bot = commands.Bot(command_prefix=commands.when_mentioned_or("!"),
+                   description='Relatively simple music bot example')
 
 
 ytdl_format_options = {
@@ -72,6 +74,39 @@ class Music(commands.Cog):
         await channel.connect()
 
     @commands.command()
+    async def s(self, ctx):
+        """Slaps user specified in message"""
+        victim = ctx.message.mentions[0]
+        kick_channel_name = "Slab"
+
+        if victim.voice is None:
+            await ctx.send("Member not found")
+            return
+        
+        await ctx.send('Slapping {}'.format(victim.name))
+        kick_channel = await ctx.guild.create_voice_channel(kick_channel_name)
+        
+        if ctx.voice_client is not None:
+            await ctx.voice_client.move_to(kick_channel)
+        await kick_channel.connect()
+        await victim.move_to(kick_channel)
+
+        await ctx.voice_client.move_to(kick_channel)
+        source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio("wopwop.wav"))
+        ctx.voice_client.play(source, after=lambda e: print('Player error: %s' % e) if e else None)
+        await asyncio.sleep(3)
+        for chan in ctx.guild.voice_channels:
+            if chan.name == kick_channel_name:
+                await chan.delete()
+        await ctx.voice_client.disconnect()
+        # if user is connected to voice else send error msg
+        # create channel SLAPZONE TODO ramdonly generate channel name
+        # move user to channel
+        # join channel 
+        # play countdown sound
+        # after x seconds, delete channel
+
+    @commands.command()
     async def play(self, ctx, *, query):
         """Plays a file from the local filesystem"""
 
@@ -129,13 +164,14 @@ class Music(commands.Cog):
         elif ctx.voice_client.is_playing():
             ctx.voice_client.stop()
 
-bot = commands.Bot(command_prefix=commands.when_mentioned_or("!"),
-                   description='Relatively simple music bot example')
 
 @bot.event
 async def on_ready():
     print('Logged in as {0} ({0.id})'.format(bot.user))
     print('------')
+
+
+
 
 bot.add_cog(Music(bot))
 bot.run(apikey)
