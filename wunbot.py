@@ -45,8 +45,6 @@ ffmpeg_options = {
 
 ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 
-
-
 today = datetime.datetime.now()
 day_of_year = (today - datetime.datetime(today.year, 1, 1)).days + 1
 filenames = glob.glob1('pictures', '*.*')
@@ -60,8 +58,16 @@ abs_file_path = os.path.join(script_dir, rel_path)
 
 
 # sql variables
-strikeDB = "testdatabase.db"
-strikeTable = "strike"
+aliasDB = "aliases.db"
+aliasTable = "strike"
+
+conn = sqlite3.connect(aliasDB)
+c = conn.cursor()
+c.execute("""CREATE TABLE IF NOT EXISTS alias (
+    id integer PRIMARY KEY, 
+    name text
+    )""")
+conn.commit()
 
 filename = " "
 def open_file(filename):
@@ -108,6 +114,33 @@ async def on_message(message):
     # allows @bot.command() to continue functioning
     await bot.process_commands(message)
 
+
+class Alias(commands.Cog):
+    """Holds alias manipulation. Resides in its own cog for learning purposes."""
+    def __init__(self, bot):
+        self.bot = bot
+        tid = 9845780123
+        name = "coruman"
+        # TODO should alias be deleted if member is gone for x days?
+        # TODO maybe add prune command
+        
+        
+        
+    
+    @commands.command()
+    async def alias(self, ctx):
+        """TODO"""
+        await ctx.send("Alias test")
+        
+
+        # await ctx.send(memlistname)
+    @commands.command()
+    async def editalias(self, ctx, arg):
+        """TODO"""
+        await ctx.send("Alias test")
+
+
+
 class YTDLSource(discord.PCMVolumeTransformer):
     def __init__(self, source, *, data, volume=0.5):
         super().__init__(source, volume)
@@ -132,6 +165,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
 class Music(commands.Cog):
     def __init__(self, bot):
+        self.kick_sound_effects = ["wopwop.wav","denied.wav","e.wav","VHS.mp3"]
         self.bot = bot
 
     @commands.command()
@@ -144,13 +178,17 @@ class Music(commands.Cog):
         await channel.connect()
 
     @commands.command()
+    async def list_effects(self, ctx):
+        """Joins a voice channel"""
+        await ctx.send(self.kick_sound_effects)
+
+    @commands.command()
     async def s(self, ctx):
         """Slaps user specified in message"""
         victim = ctx.message.mentions[0]
         kick_channel_name = "Slab"
         
-        kick_sound_effects = ["wopwop.wav","denied.wav","e.wav","VHS.mp3"]
-        kick_sound = random.choice(kick_sound_effects)
+        kick_sound = random.choice(self.kick_sound_effects)
         kick_channel_name = kick_sound[0:-4]
         kick_sound = "assets\\" + kick_sound
 
@@ -174,12 +212,6 @@ class Music(commands.Cog):
             if chan.name == kick_channel_name:
                 await chan.delete()
         await ctx.voice_client.disconnect()
-        # if user is connected to voice else send error msg
-        # create channel SLAPZONE TODO ramdonly generate channel name
-        # move user to channel
-        # join channel 
-        # play countdown sound
-        # after x seconds, delete channel
 
     @commands.command()
     async def play(self, ctx, *, query):
@@ -243,6 +275,31 @@ class Music(commands.Cog):
 async def on_ready():
     print('Logged in as {0} ({0.id})'.format(bot.user))
     print('------')
+    memlistname = []
+    memlistid = []
+    members = bot.get_all_members()
+    for member in members:
+        memlistname.append(member.name)
+        memlistid.append(member.id)
+    # print(random.choice(members))
+    c.execute("SELECT name FROM alias")
+    smemlistname = c.fetchall()
+    c.execute("SELECT id FROM alias")
+    smemlistid = c.fetchall()
+
+    print("memlistname is ", memlistname)
+    print("memlistid is ", memlistid)
+    print("smemlistname is ", smemlistname)
+    print("smemlistid is ", smemlistid)
+    diffmemlistname = [x for x in memlistname if x not in smemlistname]
+    print("diffmemlistname is ", diffmemlistname)
+    # c.execute("INSERT INTO alias VALUES ({},'{}')".format(tid,name))
+    conn.commit()
+    c.execute("SELECT * FROM alias")
+    print(c.fetchall())
+    # iterates over members in server
+    # adds default nickname
 
 bot.add_cog(Music(bot))
+bot.add_cog(Alias(bot))
 bot.run(apikey)
