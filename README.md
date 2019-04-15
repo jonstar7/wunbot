@@ -4,10 +4,10 @@ wunbot is an unfinished Discord bot written in [Python](https://www.python.org "
 Everything is in flux and it's great.
 
 ![](gluten-free)
-<img src="https://forthebadge.com/images/badges/gluten-free.svg">
+<img src="https://forthebadge.com/images/badges/gluten-free.svg"> ![](not-an-issue)<img src="https://forthebadge.com/images/badges/not-an-issue.svg">
 ### How do I set it up?
 
-Get that Python 3 virtual environment set up in Linux with a with a quick 
+Get that Python 3 virtual environment set up in Linux with a quick 
 ```bash
 python3 -m virtualenv venv
 source venv/bin/activate
@@ -15,7 +15,7 @@ pip install -r requirements.txt
 ```
 And of course for Windows instead of `source venv/bin/activate` use `.\venv\Scripts\activate`
 
-Simply replace apikey with your Discord bot's apikey and run like any other Python program `python3 wunbot.py` 
+Or you could simply replace the apikey variable inside wunbot.py with your Discord bot's apikey and run like any other Python program `python3 wunbot.py` 
 
 On Windows, I like to make a .bat with the contents. For Linux replace "SET" with "export" and add quotes around the api key.
 ```
@@ -24,7 +24,7 @@ python FILENAME_TO_RUN.py
 pause
 ```
 
-[Discord.py](https://github.com/Rapptz/discord.py) is a dependancy. Make sure to `python3 -m pip install -U discord.py` before running. 
+Powered by [Discord.py](https://github.com/Rapptz/discord.py)
 
 ### Commands
 #### No longer accurate, will be updating when stable. 
