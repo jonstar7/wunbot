@@ -8,5 +8,6 @@ sendtracker.txt
 /venv
 /env
 *.db
+*.sh
 
 /.vscode
