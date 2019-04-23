@@ -275,31 +275,40 @@ class Music(commands.Cog):
 async def on_ready():
     print('Logged in as {0} ({0.id})'.format(bot.user))
     print('------')
-    memlistname = []
-    memlistid = []
+
+    # creates temp table to compare changes
+    c.execute("""CREATE TEMPORARY TABLE temp (
+    id integer PRIMARY KEY, 
+    name text
+    )""")
+
+    # iterate through all members and add to temp table
     members = bot.get_all_members()
     for member in members:
-        memlistname.append(member.name)
-        memlistid.append(member.id)
-    # print(random.choice(members))
-    c.execute("SELECT name FROM alias")
-    smemlistname = c.fetchall()
-    c.execute("SELECT id FROM alias")
-    smemlistid = c.fetchall()
+        c.execute("INSERT INTO temp VALUES ({},'{}')".format(member.id, member.name))
+    
+    # compare temp with alias and Insert Where Not Exists 
+    c.execute("""
+    INSERT INTO alias (id, name)
+    SELECT id, name
+    FROM temp
+    WHERE NOT EXISTS (Select id, name From alias WHERE alias.id = temp.id)
+    """)
 
-    print("memlistname is ", memlistname)
-    print("memlistid is ", memlistid)
-    print("smemlistname is ", smemlistname)
-    print("smemlistid is ", smemlistid)
-    diffmemlistname = [x for x in memlistname if x not in smemlistname]
-    diffmemlistid = [x for x in memlistid if x not in smemlistid]
-    print("diffmemlistname is ", diffmemlistname)
-    for i in range(len(diffmemlistname)):
-        c.execute("INSERT INTO alias VALUES ({},'{}')".format(diffmemlistid[i],diffmemlistname[i]))
+    # commits changes and prints debug message
     conn.commit()
     c.execute("SELECT * FROM alias")
     print("okay")
     print(c.fetchall())
+
+    # print(random.choice(members))
+    # c.execute("SELECT name FROM alias")
+    # smemlistname = c.fetchall()
+    # c.execute("SELECT id FROM alias")
+    # smemlistid = c.fetchall()
+
+
+
     # iterates over members in server
     # adds default nickname
 
