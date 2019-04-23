@@ -12,6 +12,8 @@ import youtube_dl
 import music
 import fileSender
 
+
+
 bot = commands.Bot(command_prefix='$')
 apikey = os.getenv("apikey")
 channelID = os.getenv("channelID")
@@ -43,7 +45,7 @@ async def length(ctx):
 async def t(ctx):
     msg = await ctx.message.author.fetch_message(570140364036505600)
     await ctx.send('Your message is {} characters long.'.format(len(msg.content)))
-
+last_chan_sent_msg_id = 0
 @bot.command()
 async def goode(ctx):
     # await asyncio.sleep(3)
@@ -51,42 +53,26 @@ async def goode(ctx):
     reactionMemberDict[ctx.message.author.id] = ctx.message.id
     await ctx.send('message id = {}'.format(ctx.message.id))
     await ctx.send('React to this message with every good boy emote{}'.format(ctx.message.reactions))
+    last_chan_sent_msg_id = ctx.channel.last_message_id
+    lastMsg = await ctx.channel.fetch_message(last_chan_sent_msg_id)
+    print(lastMsg)
 
 @bot.command()
 async def finish(ctx):
-    messid = 0
-    if ctx.message.author.id in reactionMemberDict:
-        messid = reactionMemberDict[ctx.message.author.id]
-        await ctx.send('messid = {}'.format(messid))
-    else:
-        await ctx.send('Please run the accompanying command first')
-        return
-    msg = await ctx.message.author.fetch_message(messid)
-    await ctx.send('Reactions: {}'.format(ctx.message.reactions))
+    lastMsg = await ctx.channel.fetch_message(last_chan_sent_msg_id)
+    print(lastMsg)
+    react_list = lastMsg.reactions
+    await ctx.send('react_list = {}'.format(react_list))
+    # messid = 0
+    # if ctx.message.author.id in reactionMemberDict:
+    #     messid = reactionMemberDict[ctx.message.author.id]
+    #     await ctx.send('messid = {}'.format(messid))
+    # else:
+    #     await ctx.send('Please run the accompanying command first')
+    #     return
+    # msg = await ctx.message.author.fetch_message(messid)
+    # await ctx.send('Reactions: {}'.format(ctx.message.reactions))
 
-
-
-# cond = asyncio.Condition()
-    # async with cond:
-    #     await ctx.send('before condition')
-    #     await cond.wait()
-    #     await ctx.send('after condition')
-# lock = asyncio.Lock()
-# @bot.command()
-# async def goode(ctx):
-#     # await asyncio.sleep(3)
-#     await ctx.send('React to this message with every good boy emote{}'.format(ctx.message.reactions))
-#     await lock.acquire()
-#     try:
-#         print('coro2 acquired lock')
-#     finally:
-#         print('coro2 released lock')
-#         lock.release()
-#         await ctx.send('Reactions: {}'.format(ctx.message.reactions))
-
-# @bot.command()
-# async def finish(ctx):
-#     lock.release()
 
 @bot.event
 async def on_message(message):
