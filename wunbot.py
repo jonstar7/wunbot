@@ -45,24 +45,30 @@ async def length(ctx):
 async def t(ctx):
     msg = await ctx.message.author.fetch_message(570140364036505600)
     await ctx.send('Your message is {} characters long.'.format(len(msg.content)))
-last_chan_sent_msg_id = 0
+
+reactSetupDone = False
 @bot.command()
 async def goode(ctx):
     # await asyncio.sleep(3)
     # print(ctx.message.author.id) 
+    reactSetupDone = False
     reactionMemberDict[ctx.message.author.id] = ctx.message.id
     await ctx.send('message id = {}'.format(ctx.message.id))
     await ctx.send('React to this message with every good boy emote{}'.format(ctx.message.reactions))
     last_chan_sent_msg_id = ctx.channel.last_message_id
     lastMsg = await ctx.channel.fetch_message(last_chan_sent_msg_id)
     print(lastMsg)
+    while reactSetupDone != True:
+        await asyncio.sleep(1)
+    reactSetupDone = False
+    react_list = lastMsg.reactions
+    await ctx.send('react_list = {}'.format(react_list))
+
 
 @bot.command()
 async def finish(ctx):
-    lastMsg = await ctx.channel.fetch_message(last_chan_sent_msg_id)
-    print(lastMsg)
-    react_list = lastMsg.reactions
-    await ctx.send('react_list = {}'.format(react_list))
+    await ctx.send('Finishing')
+    reactSetupDone = True
     # messid = 0
     # if ctx.message.author.id in reactionMemberDict:
     #     messid = reactionMemberDict[ctx.message.author.id]
@@ -73,6 +79,9 @@ async def finish(ctx):
     # msg = await ctx.message.author.fetch_message(messid)
     # await ctx.send('Reactions: {}'.format(ctx.message.reactions))
 
+@bot.command()
+async def alex(ctx):
+    await ctx.send("alex is {} should be {}".format(bot.get_user(126249469950951424), 126249469950951424))
 
 @bot.event
 async def on_message(message):
@@ -98,7 +107,7 @@ async def on_reaction_add(reaction, user):
 # mean easter egg 
 @bot.event
 async def on_message_delete(message):
-    alex = bot.get_member(126249469950951424) # gets alex
+    alex = bot.get_user(126249469950951424) # gets alex
     if alex == message.author:
         fmt = '{0.author} has deleted the message: {0.content}'
         msgchan = bot.get_channel(487356952528027670) # proletariat_resistance
