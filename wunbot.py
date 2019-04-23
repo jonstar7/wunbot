@@ -30,9 +30,26 @@ c.execute("""CREATE TABLE IF NOT EXISTS alias (
     )""")
 conn.commit()
 
+reactionLock = asyncio.Lock()
+
 @bot.command()
 async def length(ctx):
     await ctx.send('Your message is {} characters long.'.format(len(ctx.message.content)))
+
+
+cond = asyncio.Condition()
+@bot.command()
+async def goode(ctx):
+    # await asyncio.sleep(3)
+    await ctx.send('React to this message with every good boy emote{}'.format(ctx.message.reactions))
+    async with cond:
+        await cond.wait()
+    await ctx.send('Reactions: {}'.format(ctx.message.reactions))
+
+@bot.command()
+async def finish(ctx):
+    cond.notify_all()
+
 
 @bot.event
 async def on_message(message):
@@ -47,8 +64,20 @@ async def on_message(message):
 @bot.event
 async def on_reaction_add(reaction, user):
     channel = reaction.message.channel
+    # debug limiting to #commands
+    if channel != bot.get_channel(139855291629043713):
+        return
     print(reaction.emoji)
-    await channel.send('{} has added {} to the the message {}'.format(user.name,reaction.emoji,reaction.message.content))
+    await channel.send('{} has added {} to the message {}'.format(user.name,reaction.emoji,reaction.message.content))
+
+# mean easter egg 
+@bot.event
+async def on_message_delete(message):
+    alex = bot.get_member(126249469950951424) # gets alex
+    if alex == message.author:
+        fmt = '{0.author} has deleted the message: {0.content}'
+        msgchan = bot.get_channel(487356952528027670) # proletariat_resistance
+        await msgchan.send(fmt.format(message))
 
 class Alias(commands.Cog):
     """Holds alias manipulation. Resides in its own cog for learning purposes."""
