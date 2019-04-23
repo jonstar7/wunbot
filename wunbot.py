@@ -1,6 +1,3 @@
-
-# Discord bot that sends 1 file in pictures/*.* based on the day, once daily. 
-# the above line is now an untruth
 import discord
 from discord.ext import commands
 import asyncio
@@ -18,11 +15,8 @@ import fileSender
 bot = commands.Bot(command_prefix='$')
 apikey = os.getenv("apikey")
 channelID = os.getenv("channelID")
-
-
 bot = commands.Bot(command_prefix=commands.when_mentioned_or("!"),
                    description='Slap your friends')
-
 
 # sql variables
 aliasDB = "aliases.db"
@@ -36,12 +30,9 @@ c.execute("""CREATE TABLE IF NOT EXISTS alias (
     )""")
 conn.commit()
 
-
-
 @bot.command()
 async def length(ctx):
     await ctx.send('Your message is {} characters long.'.format(len(ctx.message.content)))
-
 
 @bot.event
 async def on_message(message):
@@ -79,7 +70,6 @@ class Alias(commands.Cog):
         """TODO"""
         await ctx.send("Alias test")
 
-
 @bot.event
 async def on_ready():
     print('Logged in as {0} ({0.id})'.format(bot.user))
@@ -109,7 +99,6 @@ async def on_ready():
     c.execute("SELECT * FROM alias")
     print("okay")
     print(c.fetchall())
-
 
 bot.add_cog(music.Music(bot))
 bot.add_cog(fileSender.FileSender(bot))
