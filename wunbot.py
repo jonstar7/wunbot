@@ -32,24 +32,61 @@ conn.commit()
 
 reactionLock = asyncio.Lock()
 
+reactionMemberDict = {
+}
+
 @bot.command()
 async def length(ctx):
     await ctx.send('Your message is {} characters long.'.format(len(ctx.message.content)))
 
+@bot.command()
+async def t(ctx):
+    msg = await ctx.message.author.fetch_message(570140364036505600)
+    await ctx.send('Your message is {} characters long.'.format(len(msg.content)))
 
-cond = asyncio.Condition()
 @bot.command()
 async def goode(ctx):
     # await asyncio.sleep(3)
+    # print(ctx.message.author.id) 
+    reactionMemberDict[ctx.message.author.id] = ctx.message.id
+    await ctx.send('message id = {}'.format(ctx.message.id))
     await ctx.send('React to this message with every good boy emote{}'.format(ctx.message.reactions))
-    async with cond:
-        await cond.wait()
-    await ctx.send('Reactions: {}'.format(ctx.message.reactions))
 
 @bot.command()
 async def finish(ctx):
-    cond.notify_all()
+    messid = 0
+    if ctx.message.author.id in reactionMemberDict:
+        messid = reactionMemberDict[ctx.message.author.id]
+        await ctx.send('messid = {}'.format(messid))
+    else:
+        await ctx.send('Please run the accompanying command first')
+        return
+    msg = await ctx.message.author.fetch_message(messid)
+    await ctx.send('Reactions: {}'.format(ctx.message.reactions))
 
+
+
+# cond = asyncio.Condition()
+    # async with cond:
+    #     await ctx.send('before condition')
+    #     await cond.wait()
+    #     await ctx.send('after condition')
+# lock = asyncio.Lock()
+# @bot.command()
+# async def goode(ctx):
+#     # await asyncio.sleep(3)
+#     await ctx.send('React to this message with every good boy emote{}'.format(ctx.message.reactions))
+#     await lock.acquire()
+#     try:
+#         print('coro2 acquired lock')
+#     finally:
+#         print('coro2 released lock')
+#         lock.release()
+#         await ctx.send('Reactions: {}'.format(ctx.message.reactions))
+
+# @bot.command()
+# async def finish(ctx):
+#     lock.release()
 
 @bot.event
 async def on_message(message):
@@ -69,6 +106,8 @@ async def on_reaction_add(reaction, user):
         return
     print(reaction.emoji)
     await channel.send('{} has added {} to the message {}'.format(user.name,reaction.emoji,reaction.message.content))
+
+
 
 # mean easter egg 
 @bot.event
