@@ -59,6 +59,7 @@ async def goode(ctx):
     lastMsg = await ctx.channel.fetch_message(last_chan_sent_msg_id)
     print(lastMsg)
     while reactSetupDone != True:
+        await ctx.send('we\'re stuck in a loop reactSetupDone={}'.format(reactSetupDone))
         await asyncio.sleep(1)
     reactSetupDone = False
     react_list = lastMsg.reactions
