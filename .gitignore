@@ -11,3 +11,5 @@ sendtracker.txt
 *.sh
 
 /.vscode
+__pycache__/music.cpython-36.pyc
+aliases.db

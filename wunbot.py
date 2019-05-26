@@ -135,6 +135,17 @@ class Alias(commands.Cog):
         await ctx.send("Alias test")
 
 @bot.event
+async def on_member_update(before,after):
+        n = after.nick
+        if n:
+            if n.lower().count("tim") > 0:
+                last = before.nick
+                if last:
+                    await after.edit(nick=last)
+                else:
+                    await after.edit(nick="Naw man do not do it")
+
+@bot.event
 async def on_ready():
     print('Logged in as {0} ({0.id})'.format(bot.user))
     print('------')

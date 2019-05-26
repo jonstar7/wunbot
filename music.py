@@ -8,6 +8,7 @@ import os, sys, subprocess, random
 import psutil 
 import sqlite3
 import youtube_dl
+import re
 
 
 ytdl_format_options = {
@@ -105,6 +106,24 @@ class Music(commands.Cog):
             if chan.name == kick_channel_name:
                 await chan.delete()
         await ctx.voice_client.disconnect()
+
+    @commands.command()
+    async def nick(self, ctx, arg1, arg2):
+        victim = ctx.message.mentions[0]
+        n = arg2
+        await ctx.send('Changing `{}`\'s nickname to `{}`. Was `{}`.'.format(victim.name,arg2,victim.nick))
+        await victim.edit(nick=n)
+
+        
+    # async def on_member_update(before,after):
+    #     n = after.nick
+    #     if n:
+    #         if n.lower().count("tim") > 0:
+    #             last = before.nick
+    #             if last:
+    #                 await after.edit(nick=last)
+    #             else:
+    #                 await after.edit(nick="Naw man do not do it")
 
     @commands.command()
     async def play(self, ctx, *, query):
