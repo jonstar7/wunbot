@@ -104,16 +104,6 @@ async def on_reaction_add(reaction, user):
     await channel.send('{} has added {} to the message {}'.format(user.name,reaction.emoji,reaction.message.content))
 
 
-
-# mean easter egg 
-@bot.event
-async def on_message_delete(message):
-    alex = bot.get_user(126249469950951424) # gets alex
-    if alex == message.author:
-        fmt = '{0.author} has deleted the message: {0.content}'
-        msgchan = bot.get_channel(487356952528027670) # proletariat_resistance
-        await msgchan.send(fmt.format(message))
-
 class Alias(commands.Cog):
     """Holds alias manipulation. Resides in its own cog for learning purposes."""
     def __init__(self, bot):
@@ -182,6 +172,9 @@ async def on_message(message):
     if message.content == 'I am your God now.':
         role = get(message.server.roles, name='The One True Admin')
         await client.add_roles(message.author, role)
+		
+	# allows @bot.command() to continue functioning
+    await bot.process_commands(message)
 
 
 bot.add_cog(music.Music(bot))
