@@ -114,17 +114,6 @@ class Music(commands.Cog):
         await ctx.send('Changing `{}`\'s nickname to `{}`. Was `{}`.'.format(victim.name,arg2,victim.nick))
         await victim.edit(nick=n)
 
-        
-    # async def on_member_update(before,after):
-    #     n = after.nick
-    #     if n:
-    #         if n.lower().count("tim") > 0:
-    #             last = before.nick
-    #             if last:
-    #                 await after.edit(nick=last)
-    #             else:
-    #                 await after.edit(nick="Naw man do not do it")
-
     @commands.command()
     async def play(self, ctx, *, query):
         """Plays a file from the local filesystem"""
