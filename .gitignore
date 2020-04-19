@@ -9,7 +9,18 @@ sendtracker.txt
 /env
 *.db
 *.sh
+Scripts/
+
+# hide env var files
+.env*
+..env*
+pyvenv.cfg
+
 
 /.vscode
-__pycache__/music.cpython-36.pyc
+__pycache__/
 aliases.db
+
+share/
+Lib/
+etc/

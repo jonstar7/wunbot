@@ -7,16 +7,17 @@ import os, sys, subprocess, random
 import psutil 
 import sqlite3
 import youtube_dl
+from dotenv import load_dotenv
 
 # local imports
 import music
 import fileSender
 
 
-
-bot = commands.Bot(command_prefix='$')
+load_dotenv() # load secrets from .gitignored .env file 
+# bot = commands.Bot(command_prefix='$')
 apikey = os.getenv("apikey")
-channelID = os.getenv("channelID")
+# channelID = os.getenv("channelID")
 bot = commands.Bot(command_prefix=commands.when_mentioned_or("!"),
                    description='Slap your friends')
 
