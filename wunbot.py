@@ -11,8 +11,9 @@ from dotenv import load_dotenv
 
 # local imports
 import music
-import fileSender
-
+# import fileSender
+import disorder
+import alias
 
 load_dotenv() # load secrets from .gitignored .env file 
 # bot = commands.Bot(command_prefix='$')
@@ -20,18 +21,6 @@ apikey = os.getenv("apikey")
 # channelID = os.getenv("channelID")
 bot = commands.Bot(command_prefix=commands.when_mentioned_or("!"),
                    description='Slap your friends')
-
-# sql variables
-aliasDB = "aliases.db"
-aliasTable = "strike"
-
-conn = sqlite3.connect(aliasDB)
-c = conn.cursor()
-c.execute("""CREATE TABLE IF NOT EXISTS alias (
-    id integer PRIMARY KEY, 
-    name text
-    )""")
-conn.commit()
 
 reactionLock = asyncio.Lock()
 
@@ -105,36 +94,6 @@ async def on_reaction_add(reaction, user):
     await channel.send('{} has added {} to the message {}'.format(user.name,reaction.emoji,reaction.message.content))
 
 
-
-# # mean easter egg 
-# @bot.event
-# async def on_message_delete(message):
-#     alex = bot.get_user(126249469950951424) # gets alex
-#     if alex == message.author:
-#         fmt = '{0.author} has deleted the message: {0.content}'
-#         msgchan = bot.get_channel(487356952528027670) # proletariat_resistance
-#         await msgchan.send(fmt.format(message))
-
-class Alias(commands.Cog):
-    """Holds alias manipulation. Resides in its own cog for learning purposes."""
-    def __init__(self, bot):
-        self.bot = bot
-        tid = 9845780123
-        name = "coruman"
-        # TODO should alias be deleted if member is gone for x days?
-        # TODO maybe add prune command
-    @commands.command()
-    async def alias(self, ctx):
-        """TODO"""
-        await ctx.send("Alias test")
-        
-
-        # await ctx.send(memlistname)
-    @commands.command()
-    async def editalias(self, ctx, arg):
-        """TODO"""
-        await ctx.send("Alias test")
-
 @bot.event
 async def on_member_update(before,after):
         n = after.nick
@@ -150,33 +109,11 @@ async def on_member_update(before,after):
 async def on_ready():
     print('Logged in as {0} ({0.id})'.format(bot.user))
     print('------')
+    bot.add_cog(music.Music(bot))
+    # bot.add_cog(fileSender.FileSender(bot))
+    bot.add_cog(alias.Alias(bot))
+    bot.add_cog(disorder.Disorder(bot))
 
-    # creates temp table to compare changes
-    c.execute("""CREATE TEMPORARY TABLE temp (
-    id integer PRIMARY KEY, 
-    name text
-    )""")
 
-    # iterate through all members and add to temp table
-    members = bot.get_all_members()
-    for member in members:
-        c.execute("INSERT INTO temp VALUES ({},'{}')".format(member.id, member.name))
-    
-    # compare temp with alias and Insert Where Not Exists 
-    c.execute("""
-    INSERT INTO alias (id, name)
-    SELECT id, name
-    FROM temp
-    WHERE NOT EXISTS (Select id, name From alias WHERE alias.id = temp.id)
-    """)
 
-    # commits changes and prints debug message
-    conn.commit()
-    c.execute("SELECT * FROM alias")
-    print("okay")
-    print(c.fetchall())
-
-bot.add_cog(music.Music(bot))
-bot.add_cog(fileSender.FileSender(bot))
-bot.add_cog(Alias(bot))
 bot.run(apikey)
