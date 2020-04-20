@@ -66,7 +66,23 @@ class Alias(commands.Cog):
         conn.commit()
         conn.close()
         
+    async def isMemberInfected(self, mem_id):
         
+        conn = sqlite3.connect(aliasDB)
+        c = conn.cursor()
+
+        c.execute("""SELECT * FROM alias WHERE id={}""".format(mem_id))
+        rows = c.fetchall()
+
+        # for row in rows:
+        #     print(row)
+
+        # print("yeah")
+        conn.commit()
+        conn.close()
+
+        return rows[0][2]
+
     @commands.command()
     async def alias(self, ctx):
         """TODO"""

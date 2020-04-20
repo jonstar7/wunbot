@@ -25,12 +25,23 @@ class Disorder(commands.Cog):
         if channel is not None:
             await channel.send('Welcome {0.mention}.'.format(member))
 
+    @commands.Cog.listener()
+    async def on_voice_state_update(self, member, before, after):
+        pass
+
     @commands.command()
     async def hello(self, ctx, *, member: discord.Member = None):
         """Says hello"""
         member = member or ctx.author
+
+        # retrieve cog by name
+        alias = self.bot.get_cog('Alias')
+
         if self._last_member is None or self._last_member.id != member.id:
             await ctx.send('Hello {0.name}~'.format(member))
+            retrieved_member = await alias.isMemberInfected(member.id)
+            await ctx.send('{}'.format(retrieved_member))
+
         else:
             await ctx.send('Hello {0.name}... This feels familiar.'.format(member))
         self._last_member = member
