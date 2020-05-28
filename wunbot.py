@@ -113,6 +113,7 @@ async def on_ready():
     # bot.add_cog(fileSender.FileSender(bot))
     bot.add_cog(alias.Alias(bot))
     bot.add_cog(disorder.Disorder(bot))
+    bot.add_cog(music.Alarm(bot))
 
 
 

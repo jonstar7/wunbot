@@ -56,6 +56,61 @@ class YTDLSource(discord.PCMVolumeTransformer):
         filename = data['url'] if stream else ytdl.prepare_filename(data)
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
 
+class Alarm(commands.Cog):
+    def __init__(self, bot):
+        self.yt_links = [r"https://www.youtube.com/watch?v=0C9JdnsrnbA"]
+        self.alarm_time = "13:50" # TODO add command to add and view scheduled alarms
+        self.channel_id = "585346938946191381" # TODO set this dynamically
+        self.bot = bot
+
+    async def time_check():
+        while not self.bot.client.is_closed:
+                channel = client.get_channel(channel_id)
+                messages = ('Test')
+                f = '%H:%M'
+                now = datetime.strftime(datetime.now(), f)
+
+                # get the difference between the alarm time and now
+                diff = (datetime.strptime(alarm_time, f) - datetime.strptime(now, f)).total_seconds()
+
+                # create a scheduler
+                s = sched.scheduler(time.perf_counter, time.sleep)
+
+                # arguments being passed to the function being called in s.enter
+                args = (client.send_message(channel, message), )
+
+                # enter the command and arguments into the scheduler
+                s.enter(seconds, 1, client.loop.create_task, args)
+                s.run() # run the scheduler, will block the event loop
+        
+    @commands.command()
+    async def alarm(self, ctx):
+        """Plays from a url (almost anything youtube_dl supports)"""
+        link = r"https://www.youtube.com/watch?v=0C9JdnsrnbA"
+        async with ctx.typing():
+            player = await YTDLSource.from_url(link, loop=self.bot.loop)
+            ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
+
+        await ctx.send('Now playing: {}'.format(player.title))
+    # self.bot.loop.create_task(time_check)
+
+    @commands.command()
+    async def stop(self, ctx):
+        """Stops and disconnects the bot from voice"""
+
+        await ctx.voice_client.disconnect()
+
+    @alarm.before_invoke
+    async def ensure_voice(self, ctx):
+        if ctx.voice_client is None:
+            if ctx.author.voice:
+                await ctx.author.voice.channel.connect()
+            else:
+                await ctx.send("You are not connected to a voice channel.")
+                raise commands.CommandError("Author not connected to a voice channel.")
+        elif ctx.voice_client.is_playing():
+            ctx.voice_client.stop()
+
 
 class Music(commands.Cog):
     def __init__(self, bot):
