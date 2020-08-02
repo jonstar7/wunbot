@@ -30,6 +30,18 @@ class Disorder(commands.Cog):
         pass
 
     @commands.command()
+    async def pet(self, ctx):
+        await ctx.send('*~ bips and bobs happily! ~*')
+        # print(ctx.author)
+        # await ctx.send('Hello {0.name}~'.format(member))
+        # channel = member.guild.system_channel
+        # if channel is not None:
+        #     await channel.send('Welcome {0.mention}.'.format(member))
+
+        
+
+
+    @commands.command()
     async def hello(self, ctx, *, member: discord.Member = None):
         """Says hello"""
         member = member or ctx.author
