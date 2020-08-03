@@ -12,8 +12,8 @@ from dotenv import load_dotenv
 # local imports
 import music
 # import fileSender
-import disorder
-import alias
+# import disorder
+# import alias
 
 load_dotenv() # load secrets from .gitignored .env file 
 # bot = commands.Bot(command_prefix='$')
