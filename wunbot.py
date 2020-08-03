@@ -111,9 +111,9 @@ async def on_ready():
     print('------')
     bot.add_cog(music.Music(bot))
     # bot.add_cog(fileSender.FileSender(bot))
-    bot.add_cog(alias.Alias(bot))
-    bot.add_cog(disorder.Disorder(bot))
-    bot.add_cog(music.Alarm(bot))
+    # bot.add_cog(alias.Alias(bot))
+    # bot.add_cog(disorder.Disorder(bot))
+    # bot.add_cog(music.Alarm(bot))
 
 
 
