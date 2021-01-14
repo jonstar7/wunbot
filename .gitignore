@@ -11,10 +11,13 @@ sendtracker.txt
 *.sh
 Scripts/
 
+
 # hide env var files
 .env*
 ..env*
 pyvenv.cfg
+credentials.json
+*.pickle
 
 
 /.vscode
