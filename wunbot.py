@@ -13,7 +13,8 @@ from dotenv import load_dotenv
 import music
 # import fileSender
 import disorder
-import alias
+# import alias
+import eventcog
 
 load_dotenv() # load secrets from .gitignored .env file 
 # bot = commands.Bot(command_prefix='$')
@@ -94,16 +95,16 @@ async def on_reaction_add(reaction, user):
     await channel.send('{} has added {} to the message {}'.format(user.name,reaction.emoji,reaction.message.content))
 
 
-@bot.event
-async def on_member_update(before,after):
-        n = after.nick
-        if n:
-            if n.lower().count("tim") > 0:
-                last = before.nick
-                if last:
-                    await after.edit(nick=last)
-                else:
-                    await after.edit(nick="Naw man do not do it")
+# @bot.event
+# async def on_member_update(before,after):
+#         n = after.nick
+#         if n:
+#             if n.lower().count("tim") > 0:
+#                 last = before.nick
+#                 if last:
+#                     await after.edit(nick=last)
+#                 else:
+#                     await after.edit(nick="Naw man do not do it")
 
 @bot.event
 async def on_ready():
@@ -111,9 +112,10 @@ async def on_ready():
     print('------')
     bot.add_cog(music.Music(bot))
     # bot.add_cog(fileSender.FileSender(bot))
-    bot.add_cog(alias.Alias(bot))
+    # bot.add_cog(alias.Alias(bot))
     bot.add_cog(disorder.Disorder(bot))
-    bot.add_cog(music.Alarm(bot))
+    bot.add_cog(eventcog.EventCog(bot))
+    # bot.add_cog(music.Alarm(bot))
 
 
 
